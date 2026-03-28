@@ -1,0 +1,19 @@
+# Entornos virtuales
+venv/
+env/
+.env
+
+# Archivos basura de Python y Jupyter Notebooks
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Pesos
+*.pt
+
+# Ignorar la carpeta entera de imágenes/datasets:
+Kvasir-SEG/
+pesos_ultralytics/
+sam2/
+segment-anything/
+sessile-main-Kvasir-SEG/
