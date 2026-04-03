@@ -13,6 +13,7 @@ __pycache__/
 
 # Ignorar la carpeta entera de imágenes/datasets:
 Kvasir-SEG/
+NWPU VHR-10.coco/
 pesos_ultralytics/
 pesos_finetuned/
 sam2/
