@@ -19,4 +19,4 @@ pesos_finetuned/
 sam2/
 segment-anything/
 sessile-main-Kvasir-SEG/
-SAM1-zero-shot/runs/
+SAM-zero-shot/runs/
