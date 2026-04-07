@@ -20,3 +20,5 @@ sam2/
 segment-anything/
 sessile-main-Kvasir-SEG/
 SAM-zero-shot/runs/
+refcocog/
+train2014/
