@@ -22,3 +22,6 @@ sessile-main-Kvasir-SEG/
 SAM-zero-shot/runs/
 refcocog/
 train2014/
+ISIC_2016/
+ISIC_2016_split/
+Grounding_Dino/
