@@ -57,3 +57,21 @@ def measure_inference_sam3_prompt_zero_shot(predictor, img_path, text_prompt):
         vram = 0
 
     return results, latency, vram
+
+def measure_inference_fine_tuning(predictor, image, point_coords, point_labels):
+    """Esta función mide la latencia y el consumo de VRAM de una inferencia sobre
+    un modelo fine-tuneado usando coordenadas de puntos como prompt."""
+    if torch.cuda.is_available():
+        vram_before = torch.cuda.memory_allocated() / 1024**2
+    
+    start   = time.time()
+    predictor.set_image(image)
+    masks, scores, _ = predictor.predict(point_coords=point_coords, point_labels=point_labels)
+    latency = (time.time() - start) * 1000  # Está en ms
+
+    if torch.cuda.is_available():
+        vram = torch.cuda.memory_allocated() / 1024**2 - vram_before
+    else:
+        vram = 0
+
+    return masks, scores, latency, vram
