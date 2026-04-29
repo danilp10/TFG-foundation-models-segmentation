@@ -1,7 +1,7 @@
 import time
 import torch
 
-def measure_inference_zero_shot(model, img_path, central_point):
+def measure_inference_central_point(model, img_path, central_point):
     """Mide la latencia y el consumo de VRAM de una inferencia zero-shot
     usando un punto central como prompt."""
     if torch.cuda.is_available():
