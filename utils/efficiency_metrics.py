@@ -1,5 +1,15 @@
+from groundingdino.util.inference import load_model, load_image, predict as gd_predict
 import time
 import torch
+
+
+torch.backends.cuda.matmul.allow_tf32 = True
+device = torch.device("cuda:0")
+
+GROUNDING_DINO_CONFIG = "C:\\Users\\DanielTalavera\\Desktop\\Trabajo_Fin_de_Grado\\Grounding_Dino\\GroundingDINO_SwinT_OGC.py"
+GROUNDING_DINO_WEIGHTS = "C:\\Users\\DanielTalavera\\Desktop\\Trabajo_Fin_de_Grado\\Grounding_Dino\\groundingdino_swint_ogc.pth"
+
+gd_model = load_model(GROUNDING_DINO_CONFIG, GROUNDING_DINO_WEIGHTS).to(device)
 
 def measure_inference_central_point(model, img_path, central_point):
     """Mide la latencia y el consumo de VRAM de una inferencia zero-shot
@@ -75,3 +85,39 @@ def measure_inference_fine_tuning(predictor, image, point_coords, point_labels):
         vram = 0
 
     return masks, scores, latency, vram
+
+def measure_inference_sam3_prompt_refcocog(sam_wrapper, img_path, text_prompt):
+    """Esta función mide la latencia y el consumo de VRAM de una inferencia con SAM 3
+    usando un prompt textual. Primero localiza el objeto mediante Grounding DINO
+    y luego segmenta la región detectada con SAM 3."""
+    torch.cuda.reset_peak_memory_stats()
+    vram_before = torch.cuda.memory_allocated() / 1024**2
+    start = time.time()
+
+    image_source, image_tensor = load_image(img_path)
+    boxes, logits, _ = gd_predict(
+        model=gd_model,
+        image=image_tensor,
+        caption=text_prompt,
+        box_threshold=0.3,
+        text_threshold=0.25,
+        device=device
+    )
+
+    if boxes is None or len(boxes) == 0:
+        latency = (time.time() - start) * 1000
+        vram = torch.cuda.max_memory_allocated() / 1024**2 - vram_before
+        return None, latency, vram
+
+    H, W, _ = image_source.shape
+    boxes_xyxy = boxes * torch.tensor([W, H, W, H], dtype=torch.float32).to(boxes.device)
+    cx, cy, bw, bh = boxes_xyxy[:, 0], boxes_xyxy[:, 1], boxes_xyxy[:, 2], boxes_xyxy[:, 3]
+    boxes_xyxy = torch.stack([cx - bw/2, cy - bh/2, cx + bw/2, cy + bh/2], dim=1)
+
+    best_box = boxes_xyxy[logits.argmax()].unsqueeze(0).cpu().numpy().tolist()
+
+    results = sam_wrapper(img_path, bboxes=best_box)
+
+    latency = (time.time() - start) * 1000
+    vram = torch.cuda.max_memory_allocated() / 1024**2 - vram_before
+    return results, latency, vram
