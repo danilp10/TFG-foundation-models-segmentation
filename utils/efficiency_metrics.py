@@ -121,3 +121,18 @@ def measure_inference_sam3_prompt_refcocog(sam_wrapper, img_path, text_prompt):
     latency = (time.time() - start) * 1000
     vram = torch.cuda.max_memory_allocated() / 1024**2 - vram_before
     return results, latency, vram
+
+def measure_inference_fine_tuning_refcocog(predictor, image, bbox):
+    """Mide la latencia y el consumo de VRAM de una inferencia sobre
+    un modelo fine-tuneado usando una caja delimitadora como prompt."""
+    if torch.cuda.is_available():
+        vram_before = torch.cuda.memory_allocated() / 1024**2
+    start = time.time()
+    predictor.set_image(image)
+    masks, scores, _ = predictor.predict(box=bbox, multimask_output=True)
+    latency = (time.time() - start) * 1000
+    if torch.cuda.is_available():
+        vram = torch.cuda.memory_allocated() / 1024**2 - vram_before
+    else:
+        vram = 0
+    return masks, scores, latency, vram
