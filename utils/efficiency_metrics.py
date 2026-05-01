@@ -1,15 +1,8 @@
-from groundingdino.util.inference import load_model, load_image, predict as gd_predict
 import time
 import torch
 
-
 torch.backends.cuda.matmul.allow_tf32 = True
 device = torch.device("cuda:0")
-
-GROUNDING_DINO_CONFIG = "C:\\Users\\DanielTalavera\\Desktop\\Trabajo_Fin_de_Grado\\Grounding_Dino\\GroundingDINO_SwinT_OGC.py"
-GROUNDING_DINO_WEIGHTS = "C:\\Users\\DanielTalavera\\Desktop\\Trabajo_Fin_de_Grado\\Grounding_Dino\\groundingdino_swint_ogc.pth"
-
-gd_model = load_model(GROUNDING_DINO_CONFIG, GROUNDING_DINO_WEIGHTS).to(device)
 
 def measure_inference_central_point(model, img_path, central_point):
     """Mide la latencia y el consumo de VRAM de una inferencia zero-shot
@@ -90,6 +83,12 @@ def measure_inference_sam3_prompt_refcocog(sam_wrapper, img_path, text_prompt):
     """Esta función mide la latencia y el consumo de VRAM de una inferencia con SAM 3
     usando un prompt textual. Primero localiza el objeto mediante Grounding DINO
     y luego segmenta la región detectada con SAM 3."""
+    from groundingdino.util.inference import load_model, load_image, predict as gd_predict
+
+    GROUNDING_DINO_CONFIG = "C:\\Users\\DanielTalavera\\Desktop\\Trabajo_Fin_de_Grado\\Grounding_Dino\\GroundingDINO_SwinT_OGC.py"
+    GROUNDING_DINO_WEIGHTS = "C:\\Users\\DanielTalavera\\Desktop\\Trabajo_Fin_de_Grado\\Grounding_Dino\\groundingdino_swint_ogc.pth"
+    gd_model = load_model(GROUNDING_DINO_CONFIG, GROUNDING_DINO_WEIGHTS).to(device)
+
     torch.cuda.reset_peak_memory_stats()
     vram_before = torch.cuda.memory_allocated() / 1024**2
     start = time.time()
