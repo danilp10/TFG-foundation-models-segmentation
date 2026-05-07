@@ -1,0 +1,41 @@
+unet:
+  epochs: 50
+  batch_size: 4
+  lr: 0.0001
+  img_size: 512
+  encoder_name: resnet34
+  encoder_weights: imagenet
+
+yolo:
+  epochs: 50
+  batch_size: 4
+  img_size: 512
+
+sam:
+  epochs: 50
+  batch_size: 4
+  lr: 0.0001
+  img_size: 1024
+  mask_size: 256
+
+sam2:
+  epochs: 50
+  batch_size: 4
+  lr: 0.0001
+  img_size: 1024
+  mask_size: 256
+
+sam2_1:
+  epochs: 50
+  batch_size: 4
+  lr: 0.0001
+  img_size: 1024
+  mask_size: 256
+
+sam3:
+  epochs: 50
+  batch_size: 4
+  lr: 0.0001
+  img_size: 1008
+  mask_size: 288
+  

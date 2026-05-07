@@ -1,0 +1,31 @@
+kvasir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\Kvasir-SEG
+kvasir_bboxes: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\Kvasir-SEG\kavsir_bboxes.json
+
+pascals: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\PASCAL-S\Test
+
+isic2016: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\ISIC_2016
+isic2016_split: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\ISIC_2016_split
+
+mapillary: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\Mapillary_Vistas\validation
+
+refcocog: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\refcocog
+
+sam_b_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ultralytics\sam_b.pt
+sam_l_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ultralytics\sam_l.pt
+sam2_b_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ultralytics\sam2_b.pt
+sam2_l_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ultralytics\sam2_l.pt
+sam2_1_b_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ultralytics\sam2.1_b.pt
+sam2_1_l_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ultralytics\sam2.1_l.pt
+sam3_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ultralytics\sam3.pt
+
+sam2_b_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2\sam2\configs\sam2\sam2_hiera_b+.yaml
+sam2_l_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2\sam2\configs\sam2\sam2_hiera_l.yaml
+sam2_1_b_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2\sam2\configs\sam2.1\sam2.1_hiera_b+.yaml
+sam2_1_l_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2\sam2\configs\sam2.1\sam2.1_hiera_l.yaml
+
+finetuned_weights_dir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_finetuned
+results_zero_shot_dir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\resultados_zero_shot
+results_finetuning_dir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\resultados_fine_tunning
+
+grounding_dino_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\Grounding_Dino\GroundingDINO_SwinT_OGC.py
+grounding_dino_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\Grounding_Dino\groundingdino_swint_ogc.pth
