@@ -1,17 +1,15 @@
-# Entornos virtuales
 venv/
 env/
 .env
 
-# Archivos basura de Python y Jupyter Notebooks
+
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
 
-# Pesos
 *.pt
 
-# Ignorar la carpeta entera de imágenes/datasets:
+
 Kvasir-SEG/
 PASCAL-S/
 pesos_ultralytics/
@@ -27,7 +25,6 @@ ISIC_2016_split/
 Grounding_Dino/
 Mapillary_Vistas
 Arquitecturas_clasicas/runs/
-src/
 scripts/
 tests/ 
 notebooks/
