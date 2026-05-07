@@ -1,12 +1,15 @@
 import os
 import shutil
-
 import cv2
 import numpy as np
 from ultralytics import YOLO
 
 
 def mask_to_yolo_polygon(mask_path, img_w, img_h):
+    """Convierte una máscara binaria al formato de polígono normalizado que
+    espera YOLO. Toma el contorno externo más grande y devuelve sus puntos
+    aplanados como [x1, y1, x2, y2, ...] con coordenadas en [0, 1]. Devuelve
+    None si la máscara no contiene contornos válidos."""
     mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
     mask = (mask > 127).astype(np.uint8)
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -29,6 +32,9 @@ def mask_to_yolo_polygon(mask_path, img_w, img_h):
 
 
 def convert_kvasir_to_yolo(dataset_path):
+    """Genera los ficheros de etiquetas .txt en formato YOLO para los splits
+    train, val y test. Cada .txt contiene una línea con la clase 0 (polyp)
+    seguida del polígono de la máscara correspondiente."""
     for split in ["train", "val", "test"]:
         images_dir = os.path.join(dataset_path, "images", split)
         masks_dir = os.path.join(dataset_path, "masks", split)
@@ -56,6 +62,8 @@ def convert_kvasir_to_yolo(dataset_path):
 
 
 def write_yolo_yaml(dataset_path, yaml_path, num_classes=1, class_names=("polyp",)):
+    """Escribe el fichero de configuración .yaml que YOLO necesita para
+    localizar los splits del dataset y conocer los nombres de las clases."""
     names_str = "[" + ", ".join(f"'{n}'" for n in class_names) + "]"
     content = (
         f"path: {dataset_path}\n"
@@ -71,6 +79,9 @@ def write_yolo_yaml(dataset_path, yaml_path, num_classes=1, class_names=("polyp"
 
 def train_yolo(yaml_path, output_weights, epochs=50, imgsz=512, batch=4, device=0,
                base_weights="yolov8n-seg.pt"):
+    """Entrena YOLOv8n-seg sobre el dataset descrito por yaml_path partiendo
+    de los pesos preentrenados en base_weights. Tras el entrenamiento copia
+    los mejores pesos obtenidos a output_weights."""
     model = YOLO(base_weights)
     model.train(
         data=yaml_path,

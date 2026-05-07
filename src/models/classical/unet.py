@@ -10,6 +10,9 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def train_unet(train_dataset, output_weights, epochs=50, batch_size=4, lr=1e-4,
                encoder_name="resnet34", encoder_weights="imagenet"):
+    """Entrena un modelo UNet con el encoder indicado sobre el dataset dado.
+    Usa Adam, scheduler StepLR (gamma 0.5 cada 20 épocas) y BCEWithLogitsLoss.
+    Guarda los pesos finales en output_weights y devuelve esa misma ruta."""
     model = smp.Unet(
         encoder_name=encoder_name,
         encoder_weights=encoder_weights,

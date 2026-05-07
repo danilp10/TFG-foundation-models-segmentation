@@ -73,7 +73,7 @@ def evaluate_finetuned(model, model_name, samples_iter, prompt_fn,
                        use_resize_for_hausdorff=False, prompt_type="point"):
     """Evalúa un modelo SAM/SAM2/SAM2.1/SAM3 ya fine-tuneado sobre el
     iterador de samples dado. La función prompt_fn(img_path, gt_mask) decide
-    el prompt usado en cada muestra. prompt_type indica si la inferencia se
+    el prompt usado en cada muestra, prompt_type indica si la inferencia se
     hace con punto central ('point') o con caja delimitadora ('bbox')."""
     buf = _empty_metric_buffers()
 

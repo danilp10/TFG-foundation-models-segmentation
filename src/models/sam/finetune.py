@@ -7,6 +7,10 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def train_sam(train_dataset, weights_path, output_weights, vit, epochs=50, batch_size=4, lr=1e-4):
+    """Hace fine tuning de SAM congelando el image encoder y el prompt encoder
+    y entrenando solo el mask decoder. El parámetro vit selecciona el backbone
+    ('vit_b' o 'vit_l'). Cada muestra del dataset debe devolver
+    (imagen, máscara, punto, label). Guarda los pesos en output_weights."""
     sam = sam_model_registry[vit](checkpoint=weights_path)
     sam.to(device)
 

@@ -9,6 +9,13 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def train_sam3(train_dataset, weights_path, output_weights, epochs=50, batch_size=4, lr=1e-4,
                bb_feat_sizes=((288, 288), (144, 144), (72, 72))):
+    """Hace fine tuning de SAM3 congelando el image encoder y el prompt
+    encoder y entrenando solo el mask decoder. A diferencia de SAM y SAM2,
+    SAM3 expone forward_image y _prepare_backbone_features para extraer las
+    características manualmente, y necesita conocer los tamaños de feature
+    intermedios (bb_feat_sizes) que dependen del tamaño de imagen del
+    dataset. Cada muestra debe devolver (imagen, máscara, punto, label).
+    Guarda los pesos en output_weights."""
     sam3_wrapper = SAM(weights_path)
     sam3 = sam3_wrapper.model
     for param in sam3.parameters():
