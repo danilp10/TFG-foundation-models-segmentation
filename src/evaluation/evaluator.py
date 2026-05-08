@@ -163,6 +163,7 @@ def evaluate_unet(model, test_samples, model_name, img_size=512):
         H, W = image.shape[:2]
 
         gt_mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        gt_mask = np.squeeze(gt_mask)
         gt_mask = (gt_mask > 127).astype(bool)
 
         image_resized = cv2.resize(image, (img_size, img_size))

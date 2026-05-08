@@ -39,7 +39,7 @@ def run_unet(paths, training):
     train_time = time.time() - start_train
 
     model = smp.Unet(encoder_name=training["encoder_name"], encoder_weights=None, in_channels=3, classes=1)
-    model.load_state_dict(torch.load(output_weights))
+    model.load_state_dict(torch.load(output_weights, weights_only=True))
 
     test_dataset = KvasirDataset(paths["kvasir"], "test", img_size=training["img_size"])
 
