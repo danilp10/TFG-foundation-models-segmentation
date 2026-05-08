@@ -253,6 +253,6 @@ def main():
 
     output_path = os.path.join(
         paths["results_zero_shot_dir"],
-        f"resultados_{args.model}_{args.dataset}.csv",
+        f"resultados_sam_{args.dataset}.csv",
     )
     save_results(results, output_path)

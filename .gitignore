@@ -27,5 +27,5 @@ Arquitecturas_clasicas/
 tests/ 
 notebooks/
 tfg_segmentation.egg-info/
-run_all.log/
+run_all.log
 runs/
