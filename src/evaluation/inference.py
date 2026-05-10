@@ -50,6 +50,10 @@ def measure_inference_sam3_prompt_zero_shot(predictor, img_path, text_prompt):
     predictor.set_image(img_path)
     predictor.model.set_classes(text=[text_prompt])
     predictor.prompts["text"] = [text_prompt]
+    predictor.args.save = False
+    predictor.args.show = False
+    predictor.args.save_txt = False
+    predictor.args.save_crop = False
     results = predictor()
     
     latency = (time.time() - start) * 1000

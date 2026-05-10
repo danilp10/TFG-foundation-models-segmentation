@@ -100,6 +100,7 @@ def evaluate_finetuned(model, model_name, samples_iter, prompt_fn,
         best_idx = np.argmax(scores)
         pred_mask = masks[best_idx].astype(bool)
 
+        gt_mask = np.squeeze(gt_mask)
         H, W = gt_mask.shape
         pred_mask = cv2.resize(pred_mask.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST).astype(bool)
 
@@ -125,6 +126,7 @@ def evaluate_zero_shot(model, model_name, samples_iter, inference_fn,
             continue
 
         masks = results[0].masks.data.cpu().numpy()
+        gt_mask = np.squeeze(gt_mask)
         H, W = gt_mask.shape
 
         if best_by_iou and len(masks) > 1:

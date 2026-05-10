@@ -85,7 +85,8 @@ def pascals_iter(dataset_path):
         mask_path = os.path.join(masks_dir, img_name + ".png")
         if not os.path.exists(img_path) or not os.path.exists(mask_path):
             continue
-        gt = (cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE) > 127).astype(bool)
+        gt = np.squeeze(cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE))
+        gt = (gt > 127).astype(bool)
 
         coords = np.argwhere(gt)
         if len(coords) == 0:
@@ -256,3 +257,6 @@ def main():
         f"resultados_sam_{args.dataset}.csv",
     )
     save_results(results, output_path)
+
+if __name__ == "__main__":
+    main()

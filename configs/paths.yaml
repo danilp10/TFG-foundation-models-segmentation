@@ -25,7 +25,7 @@ sam2_1_l_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2\sam2\
 
 finetuned_weights_dir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_finetuned
 results_zero_shot_dir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\resultados_zero_shot
-results_finetuning_dir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\resultados_fine_tunning
+results_finetuning_dir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\resultados_finetuned
 
 grounding_dino_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\Grounding_Dino\GroundingDINO_SwinT_OGC.py
 grounding_dino_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\Grounding_Dino\groundingdino_swint_ogc.pth

@@ -278,8 +278,7 @@ def main():
     base_weights = paths[f"{args.model}_weights"]
     config_path = paths.get(MODEL_REGISTRY[args.model].get("config_key", ""))
     output_weights = os.path.join(paths["finetuned_weights_dir"], f"{args.model}_{args.dataset}.pt")
-    family = MODEL_REGISTRY[args.model]["family"]
-    output_csv = os.path.join(paths["results_finetuning_dir"], f"resultados_{family}.csv")
+    output_csv = os.path.join(paths["results_finetuning_dir"], f"resultados_sam.csv")
 
     training_cfg = {k: training[k] for k in ("epochs", "batch_size", "lr") if k in training}
 
