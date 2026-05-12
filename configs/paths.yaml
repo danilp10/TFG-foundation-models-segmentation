@@ -18,10 +18,10 @@ sam2_1_b_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ult
 sam2_1_l_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ultralytics\sam2.1_l.pt
 sam3_weights: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_ultralytics\sam3.pt
 
-sam2_b_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2\sam2\configs\sam2\sam2_hiera_b+.yaml
-sam2_l_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2\sam2\configs\sam2\sam2_hiera_l.yaml
-sam2_1_b_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2\sam2\configs\sam2.1\sam2.1_hiera_b+.yaml
-sam2_1_l_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2\sam2\configs\sam2.1\sam2.1_hiera_l.yaml
+sam2_b_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2_repo\sam2\configs\sam2\sam2_hiera_b+.yaml
+sam2_l_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2_repo\sam2\configs\sam2\sam2_hiera_l.yaml
+sam2_1_b_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2_repo\sam2\configs\sam2.1\sam2.1_hiera_b+.yaml
+sam2_1_l_config: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\sam2_repo\sam2\configs\sam2.1\sam2.1_hiera_l.yaml
 
 finetuned_weights_dir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\pesos_finetuned
 results_zero_shot_dir: C:\Users\DanielTalavera\Desktop\Trabajo_Fin_de_Grado\resultados_zero_shot

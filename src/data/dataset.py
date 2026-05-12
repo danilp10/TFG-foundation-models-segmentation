@@ -44,6 +44,7 @@ class KvasirDataset(Dataset):
         image = torch.tensor(image).permute(2, 0, 1).float() / 255.0
 
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        mask = np.squeeze(mask)
         mask = cv2.resize(mask, (self.img_size, self.img_size))
         mask = torch.tensor((mask > 127).astype(np.float32)).unsqueeze(0)
         return image, mask
@@ -89,6 +90,7 @@ class KvasirSegDataset(Dataset):
         image = torch.tensor(image).permute(2, 0, 1).float() / 255.0
 
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        mask = np.squeeze(mask)
         mask = cv2.resize(mask, (self.mask_size, self.mask_size))
         mask = torch.tensor((mask > 127).astype(np.float32)).unsqueeze(0)
 
@@ -136,6 +138,7 @@ class PascalSegDataset(Dataset):
         image = torch.tensor(image).permute(2, 0, 1).float() / 255.0
 
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        mask = np.squeeze(mask)
         mask = cv2.resize(mask, (self.mask_size, self.mask_size))
         mask_bin = (mask > 127).astype(np.float32)
 
@@ -191,10 +194,12 @@ class ISICSegDataset(Dataset):
         image = torch.tensor(image).permute(2, 0, 1).float() / 255.0
 
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        mask = np.squeeze(mask)
         mask = cv2.resize(mask, (self.mask_size, self.mask_size))
         mask = torch.tensor((mask > 127).astype(np.float32)).unsqueeze(0)
 
         gt_full = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        gt_full = np.squeeze(gt_full)
         gt_bin = (gt_full > 127).astype(np.uint8)
         contours, _ = cv2.findContours(gt_bin, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         x, y, w, h = cv2.boundingRect(np.vstack(contours))
@@ -248,6 +253,7 @@ class RefCOCOgSegDataset(Dataset):
         image = torch.tensor(image).permute(2, 0, 1).float() / 255.0
 
         gt_full = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        gt_full = np.squeeze(gt_full)
         orig_h, orig_w = gt_full.shape
         ys, xs = np.where(gt_full > 127)
         if len(xs) > 0:

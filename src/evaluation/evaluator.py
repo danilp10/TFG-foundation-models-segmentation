@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 from src.evaluation.metrics import boundary_iou, compute_all_metrics, hausdorff_95, resize_for_hausdorff
-from src.evaluation.inference import measure_inference_fine_tuning, measure_inference_fine_tuning_refcocog
+from src.evaluation.inference import measure_inference_fine_tuning, measure_inference_fine_tuning_refcocog, measure_inference_central_point, measure_inference_refcocog
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -75,37 +75,48 @@ def evaluate_finetuned(model, model_name, samples_iter, prompt_fn,
     iterador de samples dado. La función prompt_fn(img_path, gt_mask) decide
     el prompt usado en cada muestra, prompt_type indica si la inferencia se
     hace con punto central ('point') o con caja delimitadora ('bbox')."""
+    is_sam3 = model_name.startswith("sam3")
     buf = _empty_metric_buffers()
-
     for img_path, gt_mask in samples_iter:
         prompt = prompt_fn(img_path, gt_mask)
         if prompt is None:
             continue
 
-        image = cv2.imread(img_path)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-        if prompt_type == "bbox":
-            masks, scores, latency, vram = measure_inference_fine_tuning_refcocog(
-                model, image, np.array(prompt)
-            )
+        if is_sam3:
+            if prompt_type == "bbox":
+                results, latency, vram = measure_inference_refcocog(model, img_path, prompt)
+                if results is None or results[0].masks is None:
+                    continue
+                scores = results[0].boxes.conf.cpu().numpy()
+            else:
+                results, latency, vram = measure_inference_central_point(model, img_path, prompt)
+                if results[0].masks is None or len(results[0].masks.data) == 0:
+                    continue
+                scores = results[0].probs
+            if len(scores) == 0:
+                continue
+            best_idx = int(np.argmax(scores))
+            pred_mask = results[0].masks.data[best_idx].cpu().numpy().astype(bool)
         else:
-            masks, scores, latency, vram = measure_inference_fine_tuning(
-                model, image, np.array(prompt), np.array([1])
-            )
-
-        if masks is None or len(masks) == 0:
-            continue
-
-        best_idx = np.argmax(scores)
-        pred_mask = masks[best_idx].astype(bool)
+            image = cv2.imread(img_path)
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            if prompt_type == "bbox":
+                masks, scores, latency, vram = measure_inference_fine_tuning_refcocog(
+                    model, image, np.array(prompt)
+                )
+            else:
+                masks, scores, latency, vram = measure_inference_fine_tuning(
+                    model, image, np.array(prompt), np.array([1])
+                )
+            if masks is None or len(masks) == 0:
+                continue
+            best_idx = int(np.argmax(scores))
+            pred_mask = masks[best_idx].astype(bool)
 
         gt_mask = np.squeeze(gt_mask)
         H, W = gt_mask.shape
         pred_mask = cv2.resize(pred_mask.astype(np.uint8), (W, H), interpolation=cv2.INTER_NEAREST).astype(bool)
-
         _accumulate(buf, pred_mask, gt_mask, latency, vram, use_resize_for_hausdorff)
-
     return _summarize(buf, model_name)
 
 

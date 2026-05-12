@@ -78,7 +78,7 @@ def build_train_dataset(dataset_name, paths, img_size, mask_size):
 def kvasir_prompt_fn(bboxes):
     """Devuelve una función que, dado img_path, busca el bbox del JSON y
     calcula el punto central."""
-    def fn(img_path):
+    def fn(img_path, _):
         img_name = os.path.splitext(os.path.basename(img_path))[0]
         info = bboxes.get(img_name)
         if info is None:
@@ -88,16 +88,17 @@ def kvasir_prompt_fn(bboxes):
     return fn
 
 
-def centroid_prompt_fn(gt_mask):
+def centroid_prompt_fn(_, gt_mask):
     """Devuelve el centroide de los píxeles positivos de la máscara como
     punto único."""
+    gt_mask = np.squeeze(gt_mask)
     ys, xs = np.where(gt_mask)
     if len(xs) == 0:
         return None
     return [[float(xs.mean()), float(ys.mean())]]
 
 
-def isic_prompt_fn(gt_mask):
+def isic_prompt_fn(_, gt_mask):
     """Devuelve el centro de la bbox calculada del contorno de la máscara."""
     bbox = get_bbox_from_mask(gt_mask)
     if bbox is None:
@@ -109,7 +110,7 @@ def isic_prompt_fn(gt_mask):
 def refcocog_bbox_prompt_fn(refs_by_ann_id, coco):
     """Devuelve una función que, dado img_path, busca la anotación de COCO
     correspondiente y devuelve la bbox como [xmin, ymin, xmax, ymax]."""
-    def fn(img_path):
+    def fn(img_path, _):
         ann_id = int(os.path.splitext(os.path.basename(img_path))[0])
         if ann_id not in refs_by_ann_id:
             return None
