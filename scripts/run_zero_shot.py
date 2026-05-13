@@ -106,6 +106,12 @@ def mapillary_iter(dataset_path, max_instances_per_image=5, min_pixels=100, seed
     seleccionan cuando hay más del máximo permitido."""
     images_dir = os.path.join(dataset_path, "images")
     instances_dir = os.path.join(dataset_path, "instances")
+    config_path = os.path.join(dataset_path, "config.json")
+
+    with open(config_path) as f:
+        config = json.load(f)
+    class_names = {i: label["readable"] for i, label in enumerate(config["labels"])}
+
     rng = np.random.default_rng(seed)
 
     for img_file in os.listdir(images_dir):
@@ -134,7 +140,10 @@ def mapillary_iter(dataset_path, max_instances_per_image=5, min_pixels=100, seed
             ymax, xmax = coords.max(axis=0)
             cx = xmin + (xmax - xmin) / 2
             cy = ymin + (ymax - ymin) / 2
-            yield img_path, gt_mask, [[cx, cy]]
+
+            class_id = int(inst_id) >> 8
+            text = class_names.get(class_id, "object")
+            yield img_path, gt_mask, [[cx, cy]], text
 
 
 def refcocog_iter(dataset_path, images_subdir="train2014", split="test"):
@@ -162,15 +171,20 @@ def refcocog_iter(dataset_path, images_subdir="train2014", split="test"):
 
         x, y, w, h = ann["bbox"]
         bbox = [x, y, x + w, y + h]
-        yield img_path, gt_mask, bbox
+        text = ref["sentences"][0]["raw"]
+        yield img_path, gt_mask, bbox, text
 
 
-def text_prompt_iter(samples_iter, text_prompt):
+def text_prompt_iter(samples_iter, text_prompt, use_sample_text=False):
     """Envuelve un iterador de samples reemplazando el prompt original (punto
     o bbox) por un prompt textual fijo. Se usa cuando el modelo es
     sam3_prompt y necesita texto en lugar de coordenadas."""
-    for img_path, gt, _ in samples_iter:
-        yield img_path, gt, text_prompt
+    for sample in samples_iter:
+        img_path, gt = sample[0], sample[1]
+        if use_sample_text:
+            yield img_path, gt, sample[3]
+        else:
+            yield img_path, gt, text_prompt
 
 
 def get_iter(dataset_name, paths):
@@ -238,7 +252,13 @@ def main():
 
     samples_iter = get_iter(args.dataset, paths)
     if args.model == "sam3_prompt":
-        samples_iter = text_prompt_iter(samples_iter, TEXT_PROMPTS[args.dataset])
+        samples_iter = text_prompt_iter(
+            samples_iter,
+            TEXT_PROMPTS[args.dataset],
+            use_sample_text=(args.dataset in {"refcocog", "mapillary"}),
+        )
+    elif args.dataset in {"refcocog", "mapillary"}:
+        samples_iter = ((p, g, b) for p, g, b, _ in samples_iter)
 
     inference_fn = get_inference_fn(args.model, args.dataset)
 
