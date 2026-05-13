@@ -30,3 +30,4 @@ tfg_segmentation.egg-info/
 run_all.log
 runs/
 Grounding_Dino/
+settings.json

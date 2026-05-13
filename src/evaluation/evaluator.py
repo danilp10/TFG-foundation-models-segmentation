@@ -85,17 +85,15 @@ def evaluate_finetuned(model, model_name, samples_iter, prompt_fn,
         if is_sam3:
             if prompt_type == "bbox":
                 results, latency, vram = measure_inference_refcocog(model, img_path, prompt)
-                if results is None or results[0].masks is None:
-                    continue
-                scores = results[0].boxes.conf.cpu().numpy()
             else:
                 results, latency, vram = measure_inference_central_point(model, img_path, prompt)
-                if results[0].masks is None or len(results[0].masks.data) == 0:
-                    continue
-                scores = results[0].probs
-            if len(scores) == 0:
+            if results is None or results[0].masks is None or len(results[0].masks.data) == 0:
                 continue
-            best_idx = int(np.argmax(scores))
+            if results[0].boxes is not None and len(results[0].boxes.conf) > 0:
+                scores = results[0].boxes.conf.cpu().numpy()
+                best_idx = int(np.argmax(scores))
+            else:
+                best_idx = 0
             pred_mask = results[0].masks.data[best_idx].cpu().numpy().astype(bool)
         else:
             image = cv2.imread(img_path)
