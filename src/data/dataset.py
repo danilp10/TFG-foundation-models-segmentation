@@ -137,21 +137,22 @@ class PascalSegDataset(Dataset):
         image = cv2.resize(image, (self.img_size, self.img_size))
         image = torch.tensor(image).permute(2, 0, 1).float() / 255.0
 
-        mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
-        mask = np.squeeze(mask)
-        mask = cv2.resize(mask, (self.mask_size, self.mask_size))
-        mask_bin = (mask > 127).astype(np.float32)
+        gt_full = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
+        gt_full = np.squeeze(gt_full)
+        orig_h, orig_w = gt_full.shape
 
-        ys, xs = np.where(mask_bin > 0)
+        ys, xs = np.where(gt_full > 127)
         if len(xs) > 0:
-            cx, cy = float(xs.mean()), float(ys.mean())
+            cx = float(xs.mean()) * (self.img_size / orig_w)
+            cy = float(ys.mean()) * (self.img_size / orig_h)
         else:
-            cx, cy = mask_bin.shape[1] / 2, mask_bin.shape[0] / 2
+            cx, cy = self.img_size / 2, self.img_size / 2
 
-        mask_tensor = torch.tensor(mask_bin).unsqueeze(0)
+        mask = cv2.resize(gt_full, (self.mask_size, self.mask_size))
+        mask_tensor = torch.tensor((mask > 127).astype(np.float32)).unsqueeze(0)
+
         point = torch.tensor([[cx, cy]]).float()
         label = torch.tensor([1])
-
         return image, mask_tensor, point, label
 
 

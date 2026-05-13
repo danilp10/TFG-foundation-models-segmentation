@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import torch
 import torch.nn as nn
 from sam2.build_sam import build_sam2
@@ -15,6 +16,14 @@ def train_sam2(train_dataset, weights_path, config_path, output_weights, epochs=
     extrae image_embed y high_res_feats). El config_path apunta al .yaml de
     arquitectura del modelo. Cada muestra del dataset debe devolver
     (imagen, máscara, punto, label). Guarda los pesos en output_weights."""
+    seed = 42
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
     sam2 = build_sam2(config_path, weights_path)
     sam2.to(device)
 
@@ -27,7 +36,9 @@ def train_sam2(train_dataset, weights_path, config_path, output_weights, epochs=
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
     loss_fn = nn.BCEWithLogitsLoss()
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    g = torch.Generator()
+    g.manual_seed(seed)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, generator = g)
 
     sam2.train()
     predictor = SAM2ImagePredictor(sam2)

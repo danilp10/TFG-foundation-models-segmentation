@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import random
+import numpy as np
 from segment_anything import sam_model_registry
 from torch.utils.data import DataLoader
 
@@ -11,6 +13,14 @@ def train_sam(train_dataset, weights_path, output_weights, vit, epochs=50, batch
     y entrenando solo el mask decoder. El parámetro vit selecciona el backbone
     ('vit_b' o 'vit_l'). Cada muestra del dataset debe devolver
     (imagen, máscara, punto, label). Guarda los pesos en output_weights."""
+    seed=42
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
     sam = sam_model_registry[vit](checkpoint=weights_path)
     sam.to(device)
 
@@ -23,7 +33,9 @@ def train_sam(train_dataset, weights_path, output_weights, vit, epochs=50, batch
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
     loss_fn = nn.BCEWithLogitsLoss()
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    g = torch.Generator()
+    g.manual_seed(seed)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, generator=g)
 
     sam.train()
     for epoch in range(epochs):

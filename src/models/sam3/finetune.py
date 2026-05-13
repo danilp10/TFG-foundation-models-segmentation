@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import random
+import numpy as np
 from torch.utils.data import DataLoader
 from ultralytics import SAM
 from ultralytics.models.sam import SAM3Predictor
@@ -16,6 +18,14 @@ def train_sam3(train_dataset, weights_path, output_weights, epochs=50, batch_siz
     intermedios (bb_feat_sizes) que dependen del tamaño de imagen del
     dataset. Cada muestra debe devolver (imagen, máscara, punto, label).
     Guarda los pesos en output_weights."""
+    seed = 42
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
     sam3_wrapper = SAM(weights_path)
     sam3 = sam3_wrapper.model
     for param in sam3.parameters():
@@ -33,7 +43,9 @@ def train_sam3(train_dataset, weights_path, output_weights, epochs=50, batch_siz
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.5)
     loss_fn = nn.BCEWithLogitsLoss()
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    g = torch.Generator()
+    g.manual_seed(seed)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, generator = g)
 
     predictor = SAM3Predictor(overrides={"model": weights_path, "task": "segment", "mode": "predict", "verbose": False})
     predictor.setup_model(sam3)

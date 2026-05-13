@@ -167,33 +167,32 @@ def evaluate_unet(model, test_samples, model_name, img_size=512):
     model.to(device)
     model.eval()
     buf = _empty_metric_buffers()
-
     for img_path, mask_path in test_samples:
         image = cv2.imread(img_path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         H, W = image.shape[:2]
-
         gt_mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
         gt_mask = np.squeeze(gt_mask)
         gt_mask = (gt_mask > 127).astype(bool)
-
         image_resized = cv2.resize(image, (img_size, img_size))
         image_tensor = torch.tensor(image_resized).permute(2, 0, 1).float() / 255.0
         image_tensor = image_tensor.unsqueeze(0).to(device)
 
-        vram_before = torch.cuda.memory_allocated() / 1024 ** 2 if torch.cuda.is_available() else 0
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
+            torch.cuda.synchronize()
         start = time.time()
         with torch.no_grad():
             pred = model(image_tensor)
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
         latency = (time.time() - start) * 1000
-        vram = (torch.cuda.memory_allocated() / 1024 ** 2 - vram_before) if torch.cuda.is_available() else 0
+        vram = torch.cuda.max_memory_allocated() / 1024 ** 2 if torch.cuda.is_available() else 0
 
         pred_mask = torch.sigmoid(pred).squeeze().cpu().numpy()
         pred_mask = (pred_mask > 0.5).astype(np.uint8)
         pred_mask = cv2.resize(pred_mask, (W, H), interpolation=cv2.INTER_NEAREST).astype(bool)
-
         _accumulate(buf, pred_mask, gt_mask, latency, vram)
-
     return _summarize(buf, model_name)
 
 
@@ -202,7 +201,6 @@ def evaluate_yolo(model, dataset_path, model_name, split="test"):
     test_images_dir = os.path.join(dataset_path, "images", split)
     test_masks_dir = os.path.join(dataset_path, "masks", split)
     buf = _empty_metric_buffers()
-
     for img_file in os.listdir(test_images_dir):
         if not img_file.endswith(".jpg"):
             continue
@@ -211,26 +209,26 @@ def evaluate_yolo(model, dataset_path, model_name, split="test"):
         mask_path = os.path.join(test_masks_dir, name + ".jpg")
         if not os.path.exists(mask_path):
             continue
-
         gt_mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
         gt_mask = np.squeeze(gt_mask)
         gt_mask = (gt_mask > 127).astype(bool)
         H, W = gt_mask.shape
 
-        vram_before = torch.cuda.memory_allocated() / 1024 ** 2 if torch.cuda.is_available() else 0
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
+            torch.cuda.synchronize()
         start = time.time()
         results = model(img_path, verbose=False)
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
         latency = (time.time() - start) * 1000
-        vram = (torch.cuda.memory_allocated() / 1024 ** 2 - vram_before) if torch.cuda.is_available() else 0
+        vram = torch.cuda.max_memory_allocated() / 1024 ** 2 if torch.cuda.is_available() else 0
 
         if results[0].masks is None or len(results[0].masks.data) == 0:
             continue
-
         scores = results[0].boxes.conf.cpu().numpy()
         best_idx = int(np.argmax(scores))
         pred_mask = results[0].masks.data[best_idx].cpu().numpy().astype(np.uint8)
         pred_mask = cv2.resize(pred_mask, (W, H), interpolation=cv2.INTER_NEAREST).astype(bool)
-
         _accumulate(buf, pred_mask, gt_mask, latency, vram)
-
     return _summarize(buf, model_name)
