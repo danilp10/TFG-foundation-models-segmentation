@@ -31,3 +31,4 @@ run_all.log
 runs/
 Grounding_Dino/
 settings.json
+**/pre_refactor/
