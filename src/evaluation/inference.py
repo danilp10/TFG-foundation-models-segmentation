@@ -6,6 +6,9 @@ device = torch.device("cuda:0")
 
 
 def measure_inference_central_point(model, img_path, central_point):
+    """Mide la latencia y el consumo máximo de VRAM de una inferencia
+    realizada con un modelo de Ultralytics (SAM zero-shot o SAM 3
+    fine-tuneado) usando un punto central como prompt."""
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.synchronize()
@@ -26,6 +29,9 @@ def measure_inference_central_point(model, img_path, central_point):
 
 
 def measure_inference_refcocog(model, img_path, bbox):
+    """Variante de measure_inference_central_point que utiliza una caja
+    delimitadora como prompt en lugar de un punto central. Se emplea en los
+    flujos basados en bbox como el de RefCOCOg."""
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.synchronize()
@@ -46,6 +52,9 @@ def measure_inference_refcocog(model, img_path, bbox):
 
 
 def measure_inference_sam3_prompt_zero_shot(predictor, img_path, text_prompt):
+    """Mide la latencia y el consumo máximo de VRAM de una inferencia
+    zero-shot de SAM 3 guiada por un prompt textual, utilizando su predictor
+    semántico nativo."""
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.synchronize()
@@ -73,6 +82,9 @@ def measure_inference_sam3_prompt_zero_shot(predictor, img_path, text_prompt):
 
 
 def measure_inference_fine_tuning(predictor, image, point_coords, point_labels):
+    """Mide la latencia y el consumo máximo de VRAM de una inferencia
+    realizada con un predictor de segment-anything o sam2 (SAM 1, SAM 2 o
+    SAM 2.1 fine-tuneados) usando un punto central como prompt."""
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.synchronize()
@@ -94,6 +106,9 @@ def measure_inference_fine_tuning(predictor, image, point_coords, point_labels):
 
 
 def measure_inference_fine_tuning_refcocog(predictor, image, bbox):
+    """Variante de measure_inference_fine_tuning que utiliza una caja
+    delimitadora como prompt. Habilita la salida múltiple del decodificador
+    para permitir la selección de la mejor máscara candidata."""
     if torch.cuda.is_available():
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.synchronize()
@@ -115,7 +130,15 @@ def measure_inference_fine_tuning_refcocog(predictor, image, bbox):
 
 
 class GroundingDinoSAM3Inference:
+    """Inferencia combinada Grounding DINO + SAM 3 para evaluar el modelo
+    fine-tuneado a partir de descripciones textuales. Grounding DINO localiza
+    la caja delimitadora asociada al texto y SAM 3 genera la máscara final
+    dentro de esa región."""
+
     def __init__(self, sam_wrapper, gd_config_path, gd_weights_path, box_threshold=0.3, text_threshold=0.25):
+        """Inicializa la clase cargando el modelo Grounding DINO desde su
+        archivo de configuración y sus pesos, y conserva la referencia al
+        wrapper de SAM 3 que se utilizará para la segmentación."""
         from groundingdino.util.inference import load_model
 
         self.sam_wrapper = sam_wrapper
@@ -124,9 +147,16 @@ class GroundingDinoSAM3Inference:
         self.text_threshold = text_threshold
 
     def __call__(self, _unused_first_arg, img_path, text_prompt):
+        """Permite invocar la clase como una función de inferencia con la
+        misma firma que las funciones measure_inference_*, facilitando su
+        uso dentro del flujo de evaluación."""
         return self.run(img_path, text_prompt)
 
     def run(self, img_path, text_prompt):
+        """Ejecuta el flujo completo de inferencia: Grounding DINO detecta
+        las cajas candidatas asociadas al texto, se selecciona la de mayor
+        confianza y SAM 3 genera la máscara dentro de esa región. Mide la
+        latencia y el consumo máximo de VRAM de todo el proceso."""
         from groundingdino.util.inference import load_image, predict as gd_predict
 
         torch.cuda.reset_peak_memory_stats()
