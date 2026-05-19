@@ -28,6 +28,7 @@ tests/
 notebooks/
 tfg_segmentation.egg-info/
 run_all.log
+run_eval_all.log
 runs/
 Grounding_Dino/
 settings.json
