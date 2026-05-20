@@ -25,7 +25,7 @@ ISIC_2016_split/
 Mapillary_Vistas
 Arquitecturas_clasicas/
 tests/ 
-notebooks/
+notebooks/figures/
 tfg_segmentation.egg-info/
 run_all.log
 run_eval_all.log
