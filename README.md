@@ -14,6 +14,7 @@ TFG-foundation-models-segmentation/
 ├── notebooks/                # Cuadernos auxiliares para generar figuras
 ├── scripts/                  # Puntos de entrada de la experimentación
 │   ├── run_all.py
+│   ├── run_eval_only.py
 │   ├── run_finetune.py
 │   ├── run_finetune_text_eval.py
 │   ├── run_zero_shot.py
